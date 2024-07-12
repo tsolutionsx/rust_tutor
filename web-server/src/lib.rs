@@ -1,7 +1,4 @@
-use std::{
-    sync::{mpsc, Arc, Mutex},
-    thread,
-};
+use std::{ sync::{ mpsc, Arc, Mutex }, thread };
 
 pub struct ThreadPool {
     workers: Vec<Worker>,
@@ -37,10 +34,7 @@ impl ThreadPool {
         }
     }
 
-    pub fn execute<F>(&self, f: F)
-    where
-        F: FnOnce() + Send + 'static,
-    {
+    pub fn execute<F>(&self, f: F) where F: FnOnce() + Send + 'static {
         let job = Box::new(f);
 
         self.sender.as_ref().unwrap().send(job).unwrap();
@@ -68,18 +62,20 @@ struct Worker {
 
 impl Worker {
     fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
-        let thread = thread::spawn(move || loop {
-            let message = receiver.lock().unwrap().recv();
+        let thread = thread::spawn(move || {
+            loop {
+                let message = receiver.lock().unwrap().recv();
 
-            match message {
-                Ok(job) => {
-                    println!("Worker {id} got a job; executing.");
+                match message {
+                    Ok(job) => {
+                        println!("Worker {id} got a job; executing.");
 
-                    job();
-                }
-                Err(_) => {
-                    println!("Worker {id} disconnected; shutting down.");
-                    break;
+                        job();
+                    }
+                    Err(_) => {
+                        println!("Worker {id} disconnected; shutting down.");
+                        break;
+                    }
                 }
             }
         });
