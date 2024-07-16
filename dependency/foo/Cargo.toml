@@ -1,0 +1,8 @@
+[package]
+name = "foo"
+version = "0.1.0"
+edition = "2021"
+authors = ["TSolutionsX"]
+
+[dependencies]
+bar = { path = "../bar" } # from a path in the local filesystem
